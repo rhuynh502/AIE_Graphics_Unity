@@ -20,7 +20,7 @@ Material:
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 2000
+  m_CustomRenderQueue: 2450
   stringTagMap:
     IgnoreProjection: False
     RenderType: Opaque
@@ -265,12 +265,12 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
-    - _StencilComp: 0
-    - _StencilMode: 0
+    - _StencilComp: 6
+    - _StencilMode: 1
     - _StencilNo: 1
     - _StencilOpFail: 0
     - _StencilOpPass: 0
-    - _StepOffset: 0
+    - _StepOffset: -0.072
     - _Surface: 0
     - _TransparentEnabled: 0
     - _TweakHighColorOnShadow: 0
