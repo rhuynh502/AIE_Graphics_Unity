@@ -10,7 +10,7 @@ Material:
   m_Name: pico_face_m
   m_Shader: {fileID: 4800000, guid: 766736548846cdf459a9766614dcccab, type: 3}
   m_ValidKeywords:
-  - _EMISSIVE_SIMPLE
+  - _EMISSIVE_ANIMATION
   - _IS_ANGELRING_OFF
   - _IS_CLIPPING_OFF
   - _IS_OUTLINE_CLIPPING_NO
@@ -193,7 +193,7 @@ Material:
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _EMISSIVE: 0
+    - _EMISSIVE: 1
     - _EnvironmentReflections: 1
     - _Farthest_Distance: 100
     - _GI_Intensity: 0
@@ -294,7 +294,7 @@ Material:
     - _isUnityToonshader: 1
     - _simpleUI: 0
     - _utsTechnique: 0
-    - _utsVersion: 2.08
+    - _utsVersion: 2.09
     - _utsVersionX: 2
     - _utsVersionY: 5
     - _utsVersionZ: 0
