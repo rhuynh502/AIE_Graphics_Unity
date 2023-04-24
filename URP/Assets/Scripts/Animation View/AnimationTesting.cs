@@ -10,6 +10,10 @@ public class AnimationTesting : MonoBehaviour
     [SerializeField] private Slider sliderForward;
     [SerializeField] private Slider sliderRight;
     [SerializeField] private Slider sliderZoom;
+    [SerializeField] private Slider sliderRed;
+    [SerializeField] private Slider sliderGreen;
+    [SerializeField] private Slider sliderBlue;
+    [SerializeField] private Material shirtColor;
     [SerializeField] private SkinnedMeshRenderer skinnedMeshRenderer;
     [SerializeField] private ParticleSystem petalParticle;
     
@@ -55,6 +59,11 @@ public class AnimationTesting : MonoBehaviour
     public void Zoom()
     {
         camera.transform.Translate(new float3(0, 0, sliderZoom.value));
+    }
+
+    public void SetMaterialColor()
+    {
+        
     }
 
     // This Co Routine determines the time it takes for the model to blink again
