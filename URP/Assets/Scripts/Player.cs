@@ -14,7 +14,11 @@ public class Player : MonoBehaviour
     private Camera _camera;
 
     // Set in inpsector
-    [SerializeField] private CinemachineVirtualCamera _virtualCamera;
+    [SerializeField] 
+    private CinemachineVirtualCamera _virtualCamera;
+    [SerializeField] 
+    private LayerMask _aimingLayerMask = new LayerMask();
+
 
     // This will contain basic controls based on out key ipnuts
     private Vector2 _direction;
@@ -26,6 +30,9 @@ public class Player : MonoBehaviour
     private float _speed;
     private Vector2 _playerVelocity;
     private Vector2 _smoothedPlayerVelocity;
+    private Vector3 _aimTarget;
+    private Vector3 _rotation = Vector3.zero;
+    private Vector3 _movement;
 
     // Public fields
     public float movementSpeed = 1f;
@@ -56,6 +63,8 @@ public class Player : MonoBehaviour
             _isMoving = false;
         else
             _isMoving = true;
+        _movement.x = _direction.x;
+        _movement.z = _direction.y;
     }
 
     public void OnSprint(InputAction.CallbackContext _value)
@@ -73,43 +82,67 @@ public class Player : MonoBehaviour
         _isAiming = _value.ReadValueAsButton();
     }
 
-    // Update is called once per frame
-    void FixedUpdate()
+    private void Update()
     {
-        _speed = _isSprinting ? runSpeed : !_isMoving ? 0 : movementSpeed;
-        
-
         if(!_isAiming)
         {
             CasualMovement(Time.fixedDeltaTime);
             SetAnimationActiveLayer(_animator, 1, 0, Time.deltaTime, 10);
-            SetAnimationActiveLayer(_animator, 2, 0, Time.deltaTime, 10);
+            //SetAnimationActiveLayer(_animator, 2, 0, Time.deltaTime, 10);
             _virtualCamera.Priority = 9;
+
         }
         else
         {
             SetAnimationActiveLayer(_animator, 1, 1, Time.deltaTime, 10);
-            SetAnimationActiveLayer(_animator, 2, 1, Time.deltaTime, 10);
+            //SetAnimationActiveLayer(_animator, 2, 1, Time.deltaTime, 10);
             _virtualCamera.Priority = 11;
+
         }
+    }
+
+    // Update is called once per frame
+    void FixedUpdate()
+    {
+        _speed = _isSprinting ? runSpeed : !_isMoving ? 0 : movementSpeed;
 
         _playerVelocity = Vector2.SmoothDamp(_playerVelocity, _direction, ref _smoothedPlayerVelocity, smoothTime);
 
         Vector3 move = new Vector3(_playerVelocity.x, 0, _playerVelocity.y);
         move = move.x * _camera.transform.right.normalized + move.z * _camera.transform.forward.normalized;
         move.y = 0;
-        _characterController.Move(move.normalized * Time.fixedDeltaTime * _speed);
+
+        _characterController.Move(move * Time.fixedDeltaTime * _speed);
+        /*Vector2 myScreenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
+        Ray ray = _camera.ScreenPointToRay(myScreenCenter);
+        if(Physics.Raycast(ray, out RaycastHit raycastHit, 200, _aimingLayerMask))
+            _aimTarget = raycastHit.point;
+        else
+            _aimTarget = ray.GetPoint(200);
+
+        _aimTarget.y = transform.position.y;
+        Vector3 aimDirection = (_aimTarget - transform.position).normalized;*/
+
+        /*if(move != Vector3.zero && !_isAiming)
+        {
+            transform.forward = move;
+            _playerVelocity.y = 0;
+            _playerVelocity.x = 0;
+        }
+        else if (_isAiming)
+        {
+            transform.forward = Vector3.Lerp(transform.forward, aimDirection, Time.fixedDeltaTime);
+        }*/
 
         transform.forward = move;
         Quaternion rotation = Quaternion.Euler(0, _camera.transform.eulerAngles.y, 0);
         transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.fixedDeltaTime * rotationSpeed);
-
     }
 
     private void LateUpdate()
     {
-        _animator.SetFloat("ForwardMotion", _playerVelocity.y);
-        _animator.SetFloat("RightMotion", _playerVelocity.x);
+        _animator.SetFloat("Forward", _playerVelocity.y);
+        _animator.SetFloat("Right", _playerVelocity.x);
 
         _animator.SetBool("IsMoving", _isMoving);
     }
@@ -131,5 +164,17 @@ public class Player : MonoBehaviour
     private void SetCursorState(bool state)
     {
         Cursor.lockState = state ? CursorLockMode.Locked : CursorLockMode.None;
+    }
+
+    public void OnLookPerformed(InputAction.CallbackContext _context)
+    {
+        Vector2 input = _context.ReadValue<Vector2>();
+
+        _rotation.x += (input.x * Time.deltaTime * 2f);
+        _rotation.y += (-input.y * Time.deltaTime * 2f);
+
+        _rotation.y = Mathf.Clamp(_rotation.y, -45, 45);
+        
+        transform.rotation = Quaternion.Euler(0, _rotation.x, 0);
     }
 }
