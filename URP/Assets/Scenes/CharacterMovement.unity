@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028352, g: 0.22571376, b: 0.30692244, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -694,6 +694,7 @@ MonoBehaviour:
   _aimingLayerMask:
     serializedVersion: 2
     m_Bits: 0
+  _followTransform: {fileID: 1053295973}
   movementSpeed: 1
   runSpeed: 3
   smoothTime: 0.2
@@ -753,7 +754,19 @@ MonoBehaviour:
     m_ActionId: 422bad31-185d-4807-aab2-d7316bc09562
     m_ActionName: Mouse n Keyboard/Interact[/Keyboard/e]
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1955696142}
+        m_TargetAssemblyTypeName: Player, Assembly-CSharp
+        m_MethodName: OnSprint
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 2fb3506f-82d9-4960-87bf-05a87b279b3b
     m_ActionName: Mouse n Keyboard/Sprint[/Keyboard/leftShift]
   - m_PersistentCalls:
@@ -761,7 +774,19 @@ MonoBehaviour:
     m_ActionId: f7cb20bd-0aa2-43c6-b25f-43f1e9dd93aa
     m_ActionName: Mouse n Keyboard/Jump[/Keyboard/space]
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1955696142}
+        m_TargetAssemblyTypeName: Player, Assembly-CSharp
+        m_MethodName: OnLookPerformed
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 7224b25e-a5e8-425d-9454-e4dae5e525b7
     m_ActionName: Mouse n Keyboard/Look[/Mouse/delta,/Pen/delta]
   m_NeverAutoSwitchControlSchemes: 0

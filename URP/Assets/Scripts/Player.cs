@@ -18,6 +18,8 @@ public class Player : MonoBehaviour
     private CinemachineVirtualCamera _virtualCamera;
     [SerializeField] 
     private LayerMask _aimingLayerMask = new LayerMask();
+    [SerializeField]
+    private Transform _followTransform;
 
 
     // This will contain basic controls based on out key ipnuts
@@ -69,7 +71,7 @@ public class Player : MonoBehaviour
 
     public void OnSprint(InputAction.CallbackContext _value)
     {
-        //_isSprinting = _value.ReadValueAsButton();
+        _isSprinting = _value.ReadValueAsButton();
 
         if(_value.started)
             _isSprinting = true;
@@ -113,38 +115,23 @@ public class Player : MonoBehaviour
         move.y = 0;
 
         _characterController.Move(move * Time.fixedDeltaTime * _speed);
-        /*Vector2 myScreenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
-        Ray ray = _camera.ScreenPointToRay(myScreenCenter);
-        if(Physics.Raycast(ray, out RaycastHit raycastHit, 200, _aimingLayerMask))
-            _aimTarget = raycastHit.point;
-        else
-            _aimTarget = ray.GetPoint(200);
-
-        _aimTarget.y = transform.position.y;
-        Vector3 aimDirection = (_aimTarget - transform.position).normalized;*/
-
-        /*if(move != Vector3.zero && !_isAiming)
-        {
-            transform.forward = move;
-            _playerVelocity.y = 0;
-            _playerVelocity.x = 0;
-        }
-        else if (_isAiming)
-        {
-            transform.forward = Vector3.Lerp(transform.forward, aimDirection, Time.fixedDeltaTime);
-        }*/
-
-        transform.forward = move;
+        
         Quaternion rotation = Quaternion.Euler(0, _camera.transform.eulerAngles.y, 0);
         transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.fixedDeltaTime * rotationSpeed);
+        
     }
 
     private void LateUpdate()
     {
-        _animator.SetFloat("Forward", _playerVelocity.y);
-        _animator.SetFloat("Right", _playerVelocity.x);
+        _animator.SetFloat("Forward", Mathf.Lerp(_playerVelocity.y, _playerVelocity.y * (_isSprinting ? runSpeed : _speed), Time.deltaTime * 50));
+        _animator.SetFloat("Right", _playerVelocity.x * (_isSprinting ? runSpeed : _speed));
 
         _animator.SetBool("IsMoving", _isMoving);
+
+        if (_isSprinting)
+            _animator.SetFloat("SpeedMultiplier", runSpeed);       
+        else
+            _animator.SetFloat("SpeedMultiplier", _speed);
     }
 
     void CasualMovement(float dt)
@@ -174,7 +161,9 @@ public class Player : MonoBehaviour
         _rotation.y += (-input.y * Time.deltaTime * 2f);
 
         _rotation.y = Mathf.Clamp(_rotation.y, -45, 45);
-        
+
+        transform.forward = new Vector3(transform.forward.x + input.x, 0, transform.forward.z + input.y);
         transform.rotation = Quaternion.Euler(0, _rotation.x, 0);
+        _followTransform.localRotation = Quaternion.Euler(_rotation.y, 0, 0);
     }
 }
