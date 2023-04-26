@@ -1,26 +1,50 @@
+using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class AnimationTesting : MonoBehaviour
 {
     [SerializeField] private Animator animator;
+    [SerializeField] private Material shirtColor;
+    [SerializeField] private SkinnedMeshRenderer skinnedMeshRenderer;
+    [SerializeField] private ParticleSystem petalParticle;
+    [SerializeField] private Player player;
+    [SerializeField] private PlayerInput playerInput;
+    [SerializeField] private Transform pauseScreen;
+    [SerializeField] private CinemachineVirtualCamera virtualCamera;
+
+    [Header("Sliders")]
     [SerializeField] private Slider sliderForward;
     [SerializeField] private Slider sliderRight;
     [SerializeField] private Slider sliderZoom;
     [SerializeField] private Slider sliderRed;
     [SerializeField] private Slider sliderGreen;
     [SerializeField] private Slider sliderBlue;
-    [SerializeField] private Material shirtColor;
-    [SerializeField] private SkinnedMeshRenderer skinnedMeshRenderer;
-    [SerializeField] private ParticleSystem petalParticle;
-    
+    [SerializeField] private Slider sliderMetallic;
+    [SerializeField] private Slider sliderSmoothness;
+    [SerializeField] private Slider sliderFace;
+
+
     private float blinkTime = 0;
     private bool canBlink = true;
     private bool petalIsPlaying = true;
     private new Camera camera;
+
+    private void Awake()
+    {
+        // This will take the materials saved values and put them into the slider
+        sliderRed.SetValueWithoutNotify(shirtColor.GetFloat("_ColorRed"));
+        sliderGreen.SetValueWithoutNotify(shirtColor.GetFloat("_ColorGreen"));
+        sliderBlue.SetValueWithoutNotify(shirtColor.GetFloat("_ColorBlue"));
+        sliderMetallic.SetValueWithoutNotify(shirtColor.GetFloat("_Metallic"));
+        sliderSmoothness.SetValueWithoutNotify(shirtColor.GetFloat("_Smoothness"));
+
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -58,21 +82,59 @@ public class AnimationTesting : MonoBehaviour
 
     public void Zoom()
     {
-        camera.transform.Translate(new float3(0, 0, sliderZoom.value));
+        // Sets the camera's transform as the slider is moved
+        camera.transform.SetPositionAndRotation(new float3(0, 1, sliderZoom.value), Quaternion.identity);
+    }
+
+    public void ActivatePlayerInput()
+    {
+        // Toggles player input
+        player.enabled = !player.enabled;
+        playerInput.enabled = !playerInput.enabled;
+        // Turns off this canvas
+        gameObject.SetActive(false);
+        virtualCamera.Priority = 11;
+    }
+
+    public void DeActivatePlayerInput()
+    {
+        // Turns on this canvas
+        gameObject.SetActive(true);
+        // Toggles player input
+        player.enabled = !player.enabled;
+        playerInput.enabled = !playerInput.enabled;
+
+        pauseScreen.gameObject.SetActive(false);
+        virtualCamera.Priority = 9;
+    }
+
+    public void OnChangeFacialExpression()
+    {
+        ResetFacial();
+        if(sliderFace.value == 0)
+            ResetFacial();       
+        else
+            skinnedMeshRenderer.SetBlendShapeWeight((int)sliderFace.value, 100);
     }
 
     public void SetMaterialColor()
     {
-        
+        // This changes the values of the material everytime a slider is moved
+        shirtColor.SetFloat("_ColorRed", sliderRed.value);
+        shirtColor.SetFloat("_ColorGreen", sliderGreen.value);
+        shirtColor.SetFloat("_ColorBlue", sliderBlue.value);
+
+        shirtColor.SetFloat("_Metallic", sliderMetallic.value);
+        shirtColor.SetFloat("_Smoothness", sliderSmoothness.value);
     }
 
-    // This Co Routine determines the time it takes for the model to blink again
+    // This Coroutine determines the time it takes for the model to blink again
     IEnumerator Blink_CR()
     {
         canBlink = false;
-        skinnedMeshRenderer.SetBlendShapeWeight(0, Mathf.Lerp(0, 100, blinkTime / 0.35f));
+        skinnedMeshRenderer.SetBlendShapeWeight(0, Mathf.Lerp(0, 100, blinkTime / 1.2f));
         yield return new WaitForSeconds(8);
-        skinnedMeshRenderer.SetBlendShapeWeight(0, Mathf.Lerp(100, 0, blinkTime / 0.35f));
+        skinnedMeshRenderer.SetBlendShapeWeight(0, Mathf.Lerp(100, 0, blinkTime / 1.2f));
         canBlink = true;
     }
 
@@ -90,7 +152,8 @@ public class AnimationTesting : MonoBehaviour
 
     private void ResetFacial()
     {
-        for(int i = 6; i < 10; i++)
+        // This resets all facial expressions back to default
+        for(int i = 1; i < 10; i++)
         {
             skinnedMeshRenderer.SetBlendShapeWeight(i, 0);
         }

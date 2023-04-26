@@ -89,6 +89,15 @@ public partial class @Inputs : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Pause"",
+                    ""type"": ""Button"",
+                    ""id"": ""930ad188-e69d-4bbb-9821-81e9304d7a48"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -212,6 +221,17 @@ public partial class @Inputs : IInputActionCollection2, IDisposable
                     ""action"": ""Look"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b95bc95e-1882-4d39-a09a-cb88fb525200"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Pause"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -227,6 +247,7 @@ public partial class @Inputs : IInputActionCollection2, IDisposable
         m_MousenKeyboard_Sprint = m_MousenKeyboard.FindAction("Sprint", throwIfNotFound: true);
         m_MousenKeyboard_Jump = m_MousenKeyboard.FindAction("Jump", throwIfNotFound: true);
         m_MousenKeyboard_Look = m_MousenKeyboard.FindAction("Look", throwIfNotFound: true);
+        m_MousenKeyboard_Pause = m_MousenKeyboard.FindAction("Pause", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -293,6 +314,7 @@ public partial class @Inputs : IInputActionCollection2, IDisposable
     private readonly InputAction m_MousenKeyboard_Sprint;
     private readonly InputAction m_MousenKeyboard_Jump;
     private readonly InputAction m_MousenKeyboard_Look;
+    private readonly InputAction m_MousenKeyboard_Pause;
     public struct MousenKeyboardActions
     {
         private @Inputs m_Wrapper;
@@ -304,6 +326,7 @@ public partial class @Inputs : IInputActionCollection2, IDisposable
         public InputAction @Sprint => m_Wrapper.m_MousenKeyboard_Sprint;
         public InputAction @Jump => m_Wrapper.m_MousenKeyboard_Jump;
         public InputAction @Look => m_Wrapper.m_MousenKeyboard_Look;
+        public InputAction @Pause => m_Wrapper.m_MousenKeyboard_Pause;
         public InputActionMap Get() { return m_Wrapper.m_MousenKeyboard; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -334,6 +357,9 @@ public partial class @Inputs : IInputActionCollection2, IDisposable
                 @Look.started -= m_Wrapper.m_MousenKeyboardActionsCallbackInterface.OnLook;
                 @Look.performed -= m_Wrapper.m_MousenKeyboardActionsCallbackInterface.OnLook;
                 @Look.canceled -= m_Wrapper.m_MousenKeyboardActionsCallbackInterface.OnLook;
+                @Pause.started -= m_Wrapper.m_MousenKeyboardActionsCallbackInterface.OnPause;
+                @Pause.performed -= m_Wrapper.m_MousenKeyboardActionsCallbackInterface.OnPause;
+                @Pause.canceled -= m_Wrapper.m_MousenKeyboardActionsCallbackInterface.OnPause;
             }
             m_Wrapper.m_MousenKeyboardActionsCallbackInterface = instance;
             if (instance != null)
@@ -359,6 +385,9 @@ public partial class @Inputs : IInputActionCollection2, IDisposable
                 @Look.started += instance.OnLook;
                 @Look.performed += instance.OnLook;
                 @Look.canceled += instance.OnLook;
+                @Pause.started += instance.OnPause;
+                @Pause.performed += instance.OnPause;
+                @Pause.canceled += instance.OnPause;
             }
         }
     }
@@ -372,5 +401,6 @@ public partial class @Inputs : IInputActionCollection2, IDisposable
         void OnSprint(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
+        void OnPause(InputAction.CallbackContext context);
     }
 }

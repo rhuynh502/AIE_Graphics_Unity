@@ -1,4 +1,5 @@
 using Cinemachine;
+using System.Collections;
 using System.Data.SqlTypes;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -14,12 +15,10 @@ public class Player : MonoBehaviour
     private Camera _camera;
 
     // Set in inpsector
-    [SerializeField] 
-    private CinemachineVirtualCamera _virtualCamera;
-    [SerializeField] 
-    private LayerMask _aimingLayerMask = new LayerMask();
     [SerializeField]
     private Transform _followTransform;
+    [SerializeField]
+    private Transform _pauseScreen;
 
 
     // This will contain basic controls based on out key ipnuts
@@ -32,11 +31,10 @@ public class Player : MonoBehaviour
     private float _speed;
     private Vector2 _playerVelocity;
     private Vector2 _smoothedPlayerVelocity;
-    private Vector3 _aimTarget;
     private Vector3 _rotation = Vector3.zero;
     private Vector3 _movement;
-    private bool _isJumping;
     private float _jumpVelocity = 0;
+    private bool _isPaused = false;
 
     // Public fields
     public float movementSpeed = 1f;
@@ -72,8 +70,9 @@ public class Player : MonoBehaviour
 
     public void OnWave(InputAction.CallbackContext _value)
     {
-        _isWaving = _value.ReadValueAsButton();
-        _animator.SetTrigger("IsWaving");
+        if (!_isWaving)
+            StartCoroutine(Waving_CR());
+        
     }
 
     public void OnSprint(InputAction.CallbackContext _value)
@@ -97,17 +96,25 @@ public class Player : MonoBehaviour
             _animator.SetBool("Jumping", false);
     }
 
+    public void OnPause(InputAction.CallbackContext _value)
+    {
+        _isPaused = !_isPaused;
+
+        _pauseScreen.gameObject.SetActive(_isPaused);
+        SetCursorState(!_isPaused);
+    }
+
     private void Update()
     {
+        if (_isPaused)
+            return;
+
         if(!_isWaving)
-        {
-            //CasualMovement(Time.fixedDeltaTime);
-            SetAnimationActiveLayer(_animator, 0, 0, Time.deltaTime, 10);
+        { 
             SetAnimationActiveLayer(_animator, 1, 0, Time.deltaTime, 10);
         }
         else
         {
-            SetAnimationActiveLayer(_animator, 0, 1, Time.deltaTime, 10);
             SetAnimationActiveLayer(_animator, 1, 1, Time.deltaTime, 10);
         }
 
@@ -116,6 +123,9 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (_isPaused)
+            return;
+
         _speed = _isSprinting ? runSpeed : !_isMoving ? 0 : movementSpeed;
 
         _playerVelocity = Vector2.SmoothDamp(_playerVelocity, _direction * _speed, ref _smoothedPlayerVelocity, smoothTime);
@@ -135,6 +145,9 @@ public class Player : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (_isPaused)
+            return;
+
         _animator.SetFloat("Forward", _playerVelocity.y);
         _animator.SetFloat("Right", _playerVelocity.x);
 
@@ -144,15 +157,6 @@ public class Player : MonoBehaviour
             _animator.SetFloat("SpeedMultiplier", runSpeed);       
         else
             _animator.SetFloat("SpeedMultiplier", _speed);
-    }
-
-    void CasualMovement(float dt)
-    {
-        if(_isMoving)
-            _animator.SetFloat("Speed", _speed, 0.1f, dt);
-        else
-            _animator.SetFloat("Speed", 0);
-        
     }
 
     private void SetAnimationActiveLayer(Animator animator, int layer, int transitionValue, float dt, float rateOfChange)
@@ -167,6 +171,9 @@ public class Player : MonoBehaviour
 
     public void OnLookPerformed(InputAction.CallbackContext _context)
     {
+        if (_isPaused)
+            return;
+
         Vector2 input = _context.ReadValue<Vector2>();
 
         _rotation.x += (input.x * Time.deltaTime * 2f);
@@ -177,6 +184,15 @@ public class Player : MonoBehaviour
         transform.forward = new Vector3(transform.forward.x + input.x, 0, transform.forward.z + input.y);
         transform.rotation = Quaternion.Euler(0, _rotation.x, 0);
         _followTransform.localRotation = Quaternion.Euler(_rotation.y, 0, 0);
+
+    }
+
+    IEnumerator Waving_CR()
+    {
+        _isWaving = true;
+        _animator.SetTrigger("IsWaving");
+        yield return new WaitForSeconds(3.5f);
+        _isWaving = false;
 
     }
 }
