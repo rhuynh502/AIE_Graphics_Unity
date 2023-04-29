@@ -34,7 +34,7 @@ public class Player : MonoBehaviour
     private Vector3 _rotation = Vector3.zero;
     private Vector3 _movement;
     private float _jumpVelocity = 0;
-    private bool _isPaused = false;
+    public bool _isPaused = false;
 
     // Public fields
     public float movementSpeed = 1f;
@@ -102,6 +102,13 @@ public class Player : MonoBehaviour
 
         _pauseScreen.gameObject.SetActive(_isPaused);
         SetCursorState(!_isPaused);
+    }
+
+    public void UnPause()
+    {
+        _isPaused = false;
+        _pauseScreen.gameObject.SetActive(_isPaused);
+        
     }
 
     private void Update()

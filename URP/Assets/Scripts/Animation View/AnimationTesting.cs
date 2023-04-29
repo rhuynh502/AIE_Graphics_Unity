@@ -9,19 +9,20 @@ using UnityEngine.UI;
 
 public class AnimationTesting : MonoBehaviour
 {
-    [SerializeField] private Animator animator;
-    [SerializeField] private Material shirtColor;
-    [SerializeField] private SkinnedMeshRenderer skinnedMeshRenderer;
     [SerializeField] private ParticleSystem petalParticle;
+    [SerializeField] private CinemachineVirtualCamera virtualCamera;
+
+    [Header("Player")]
     [SerializeField] private Player player;
     [SerializeField] private PlayerInput playerInput;
     [SerializeField] private Transform pauseScreen;
-    [SerializeField] private CinemachineVirtualCamera virtualCamera;
+    [SerializeField] private Animator animator;
+    [SerializeField] private Material shirtColor;
+    [SerializeField] private SkinnedMeshRenderer skinnedMeshRenderer;
 
     [Header("Sliders")]
     [SerializeField] private Slider sliderForward;
     [SerializeField] private Slider sliderRight;
-    [SerializeField] private Slider sliderZoom;
     [SerializeField] private Slider sliderRed;
     [SerializeField] private Slider sliderGreen;
     [SerializeField] private Slider sliderBlue;
@@ -80,20 +81,12 @@ public class AnimationTesting : MonoBehaviour
         animator.SetTrigger("Jump");
     }
 
-    public void Zoom()
-    {
-        // Sets the camera's transform as the slider is moved
-        camera.transform.SetPositionAndRotation(new float3(0, 1, sliderZoom.value), Quaternion.identity);
-    }
-
     public void ActivatePlayerInput()
     {
-        // Toggles player input
-        player.enabled = !player.enabled;
-        playerInput.enabled = !playerInput.enabled;
-        // Turns off this canvas
-        gameObject.SetActive(false);
         virtualCamera.Priority = 11;
+
+        StartCoroutine(DelayInput_CR());
+
     }
 
     public void DeActivatePlayerInput()
@@ -104,8 +97,11 @@ public class AnimationTesting : MonoBehaviour
         player.enabled = !player.enabled;
         playerInput.enabled = !playerInput.enabled;
 
+        player.UnPause();
+
         pauseScreen.gameObject.SetActive(false);
         virtualCamera.Priority = 9;
+        
     }
 
     public void OnChangeFacialExpression()
@@ -136,6 +132,21 @@ public class AnimationTesting : MonoBehaviour
         yield return new WaitForSeconds(8);
         skinnedMeshRenderer.SetBlendShapeWeight(0, Mathf.Lerp(100, 0, blinkTime / 1.2f));
         canBlink = true;
+    }
+
+    // This Coroutine prevents the player from inputting while camera is moving
+    IEnumerator DelayInput_CR()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+
+        yield return new WaitForSeconds(2.5f);
+
+        // Toggles player input
+        player.enabled = !player.enabled;
+        playerInput.enabled = !playerInput.enabled;
+
+        // Turns off this canvas
+        gameObject.SetActive(false);
     }
 
     public void TogglePetals()
